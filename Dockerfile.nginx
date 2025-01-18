@@ -1,0 +1,19 @@
+FROM nginx:1.25.1-alpine
+
+COPY ./app /usr/src/app
+COPY ./bootstrap /usr/src/bootstrap
+COPY ./config /usr/src/config
+COPY ./database /usr/src/database
+COPY ./public /usr/src/public
+COPY ./resources /usr/src/resources
+COPY ./routes /usr/src/routes
+COPY ./storage /usr/src/storage
+COPY ./tests /usr/src/tests
+COPY ./artisan /usr/src/artisan
+COPY ./package.json /usr/src/package.json
+COPY ./phpunit.xml /usr/src/phpunit.xml
+COPY ./postcss.config.js /usr/src/postcss.config.js
+COPY ./tailwind.config.js /usr/src/tailwind.config.js
+COPY ./vite.config.js /usr/src/vite.config.js
+
+EXPOSE 80
