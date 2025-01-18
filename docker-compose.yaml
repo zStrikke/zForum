@@ -10,27 +10,27 @@ services:
     volumes:
       - ./deployment/config/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-      - web
+      - laravel
 
-  web:
+  laravel:
     build:
       args:
         user: zstrikke
         uid: 1000
       context: .
       dockerfile: ./Dockerfile
-      target: web
+      target: laravel
     command: sh -c "./wait-for-it.sh mysql:3306 -t 30 && ./wait-for-it.sh redis:6379 -t 30 && php-fpm"
     restart: unless-stopped
     volumes:
-      - ./app:/usr/src/app
-      - ./config:/usr/src/config
-      - ./database:/usr/src/database
-      - ./routes:/usr/src/routes
-      - ./storage:/usr/src/storage
-      - ./tests:/usr/src/tests
-      - ./composer.json:/usr/src/composer.json
-      - ./composer.lock:/usr/src/composer.lock
+      - ./laravel/app:/usr/src/app
+      - ./laravel/config:/usr/src/config
+      - ./laravel/database:/usr/src/database
+      - ./laravel/routes:/usr/src/routes
+      - ./laravel/storage:/usr/src/storage
+      - ./laravel/tests:/usr/src/tests
+      - ./laravel/composer.json:/usr/src/composer.json
+      - ./laravel/composer.lock:/usr/src/composer.lock
       - ./.env:/usr/src/.env
       - ./deployment/config/php-fpm/php-dev.ini:/usr/local/etc/php/conf.d/php.ini
     depends_on:
@@ -48,14 +48,14 @@ services:
       target: scheduler
     restart: unless-stopped
     volumes:
-      - ./app:/usr/src/app
-      - ./config:/usr/src/config
-      - ./database:/usr/src/database
-      - ./routes:/usr/src/routes
-      - ./storage:/usr/src/storage
-      - ./tests:/usr/src/tests
-      - ./composer.json:/usr/src/composer.json
-      - ./composer.lock:/usr/src/composer.lock
+      - ./laravel/app:/usr/src/app
+      - ./laravel/config:/usr/src/config
+      - ./laravel/database:/usr/src/database
+      - ./laravel/routes:/usr/src/routes
+      - ./laravel/storage:/usr/src/storage
+      - ./laravel/tests:/usr/src/tests
+      - ./laravel/composer.json:/usr/src/composer.json
+      - ./laravel/composer.lock:/usr/src/composer.lock
       - ./.env:/usr/src/.env
     depends_on:
       - update
@@ -72,14 +72,14 @@ services:
       target: worker
     restart: unless-stopped
     volumes:
-      - ./app:/usr/src/app
-      - ./config:/usr/src/config
-      - ./database:/usr/src/database
-      - ./routes:/usr/src/routes
-      - ./storage:/usr/src/storage
-      - ./tests:/usr/src/tests
-      - ./composer.json:/usr/src/composer.json
-      - ./composer.lock:/usr/src/composer.lock
+      - ./laravel/app:/usr/src/app
+      - ./laravel/config:/usr/src/config
+      - ./laravel/database:/usr/src/database
+      - ./laravel/routes:/usr/src/routes
+      - ./laravel/storage:/usr/src/storage
+      - ./laravel/tests:/usr/src/tests
+      - ./laravel/composer.json:/usr/src/composer.json
+      - ./laravel/composer.lock:/usr/src/composer.lock
       - ./.env:/usr/src/.env
     depends_on:
       - update
@@ -118,8 +118,8 @@ services:
     command: sh -c "./wait-for-it.sh mysql:3306 -t 30 && ./update.sh"
     restart: no
     volumes:
-      - ./composer.json:/usr/src/composer.json
-      - ./composer.lock:/usr/src/composer.lock
+      - ./laravel/composer.json:/usr/src/composer.json
+      - ./laravel/composer.lock:/usr/src/composer.lock
       - ./.env:/usr/src/.env
       - ./deployment/bin/update.sh:/usr/src/update.sh
     depends_on:

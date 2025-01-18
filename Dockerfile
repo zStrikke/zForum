@@ -1,4 +1,4 @@
-FROM php:8.2-fpm as web
+FROM php:8.2-fpm as laravel
 
 WORKDIR /usr/src
 
@@ -31,29 +31,14 @@ RUN useradd -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
 
-COPY ./composer*.json /usr/src/
+COPY ./laravel/composer*.json /usr/src/
 COPY ./deployment/config/php-fpm/php-prod.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./deployment/config/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY ./deployment/bin/update.sh /usr/src/update.sh
-
+COPY ./wait-for-it.sh /usr/src/wait-for-it.sh
 RUN composer install --no-scripts
 
-COPY ./app /usr/src/app
-COPY ./bootstrap /usr/src/bootstrap
-COPY ./config /usr/src/config
-COPY ./database /usr/src/database
-COPY ./public /usr/src/public
-COPY ./resources /usr/src/resources
-COPY ./routes /usr/src/routes
-COPY ./storage /usr/src/storage
-COPY ./tests /usr/src/tests
-COPY ./artisan /usr/src/artisan
-COPY ./package.json /usr/src/package.json
-COPY ./phpunit.xml /usr/src/phpunit.xml
-COPY ./postcss.config.js /usr/src/postcss.config.js
-COPY ./tailwind.config.js /usr/src/tailwind.config.js
-COPY ./vite.config.js /usr/src/vite.config.js
-COPY ./wait-for-it.sh /usr/src/wait-for-it.sh
+COPY ./laravel .
 
 RUN php artisan storage:link && \
     chmod +x ./update.sh && \
@@ -66,9 +51,9 @@ RUN php artisan storage:link && \
 
 USER $user
 
-FROM web AS worker
+FROM laravel AS worker
 COPY ./deployment/config/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisor.conf
 CMD ["/bin/sh", "-c", "supervisord -c /etc/supervisor/conf.d/supervisor.conf"]
 
-FROM web AS scheduler
+FROM laravel AS scheduler
 CMD ["/bin/sh", "-c", "nice -n 10 sleep 60 && php /usr/src/artisan schedule:run --verbose --no-interaction"]
